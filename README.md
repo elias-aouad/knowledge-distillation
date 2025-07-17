@@ -26,11 +26,8 @@ knowledge-distillation/
 
 2. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
-   ```
-   Or, if using `pyproject.toml`:
-   ```bash
-   pip install .
+   uv init
+   uv sync
    ```
 
    **Main dependencies:**
@@ -88,10 +85,6 @@ python test.py
 
 - You can adjust model size, number of layers, and other hyperparameters in `knowledge-distillation-pipeline/run.py`.
 - To use a different dataset for fine-tuning, modify `finetuning/data_utils.py`.
-
-## Citation
-
-If you use this codebase in your research, please cite the original BERT and knowledge distillation papers.
 
 ## License
 
