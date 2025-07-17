@@ -2,11 +2,6 @@ import torch
 import numpy as np
 
 
-def generate_new_dataloaders(max_n_samples=5000, batch_size=8):
-    # TODO: Implement data loader generation
-    return []
-
-
 def validate(student, device, s_vocab_size):
     student.eval()
     val_dataloaders = generate_new_dataloaders(max_n_samples=5000, batch_size=8)

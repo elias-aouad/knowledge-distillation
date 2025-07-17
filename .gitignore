@@ -120,3 +120,6 @@ output/
 
 # Knowledge Distillation specific
 *-BEST-SCORE.txt
+
+# checkpoints
+checkpoints/

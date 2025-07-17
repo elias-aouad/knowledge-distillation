@@ -4,23 +4,21 @@ from validate import validate
 from utils import read_best_score, save_best_score, save_model
 
 import torch
-from datetime import datetime, timedelta
-from time import time
 from loguru import logger
 
 
 def main():
     # === Configurations and Hyperparameters ===
-    model_name = "student_model"  # TODO: Set your model name
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     epochs = 100
-    num_heads = 12  # TODO: Set according to your model
+    num_heads, num_layers, hidden_size = 12, 12, 768
+    model_name = f'Bert-L{num_layers}-h{hidden_size}-A{num_heads}'
     alpha_L1, alpha_CE, alpha_KL, alpha_COS = 2, 1, 2, 1
     temperature = 2
-    PATH = "student_model_best.pt"  # TODO: Set your save path
+    PATH = f"{PATH}.pt"
 
     # === Load models and optimizer ===
-    student, teacher = load_models()
+    student, teacher = load_models(hidden_size=hidden_size, num_layers=num_layers, num_heads=num_heads)
     # TODO: Move models to device
     optimizer = create_optimizer(student)
 
@@ -44,11 +42,7 @@ def main():
     val_mlm_acc = []
 
     for epoch in range(epochs):
-        top = time()
-        current_time = (datetime.now() + timedelta(hours=2)).strftime("%H:%M:%S")
-        logger.info(f"\n EPOCH {epoch}")
-        logger.info(f"started at {current_time}")
-
+        logger.info(f"Starting Epoch {epoch}")
         # === Training ===
         train_loss, s_mlm_acc, t_mlm_acc, sim_s_t = train_one_epoch(
             student,
@@ -68,10 +62,9 @@ def main():
             temperature,
             train_loss_set,
         )
+        logger.info(f"Epoch {epoch} completed")
         student_mlm_distrib.append(s_mlm_acc)
         teacher_mlm_distrib.append(t_mlm_acc)
-        train_time = timedelta(seconds=int(round(time() - top)))
-        logger.info(f"Train execution time {str(train_time)}")
         logger.info(f"Train loss: {train_loss}")
         logger.info(f"student MLM train accuracy : {round(100*s_mlm_acc, 1)} %")
         logger.info(f"teacher MLM train accuracy : {round(100*t_mlm_acc, 1)} %")
@@ -82,8 +75,6 @@ def main():
         # === Validation ===
         val_s_mlm_acc = validate(student, device, s_vocab_size)
         val_mlm_acc.append(val_s_mlm_acc)
-        val_time = timedelta(seconds=int(round(time() - top))) - train_time
-        logger.info(f"Val. execution time {str(val_time)}")
         logger.info(f"student MLM val. accuracy : {round(100*val_s_mlm_acc, 1)} %")
 
         if val_s_mlm_acc > s_mlm_acc_max:

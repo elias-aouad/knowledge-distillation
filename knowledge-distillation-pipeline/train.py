@@ -2,29 +2,30 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from copy import deepcopy
-from datetime import datetime, timedelta
-from time import time
-from tqdm import trange
 import numpy as np
 
 
-# Placeholder imports for undefined functions
-def generate_new_dataloaders(batch_size=8):
-    # TODO: Implement data loader generation
-    return []
-
-
-def get_extended_attention_mask(mask, shape):
-    # TODO: Implement attention mask extension
-    return mask
+def get_extended_attention_mask(attention_mask, input_shape, device=torch.device('cpu')):
+    if attention_mask.dim() == 3:
+        extended_attention_mask = attention_mask[:, None, :, :]
+    elif attention_mask.dim() == 2:
+        extended_attention_mask = attention_mask[:, None, None, :]
+    else:
+        raise ValueError(
+            f"Wrong shape for input_ids (shape {input_shape}) or attention_mask (shape {attention_mask.shape})"
+        )
+    # dtype = float
+    extended_attention_mask = extended_attention_mask.float()  # fp16 compatibility
+    extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
+    return extended_attention_mask
 
 
 def train_one_epoch(
+    tokenizer,
     student,
     teacher,
     optimizer,
     device,
-    epoch,
     num_heads,
     s_intermediate_size,
     t_intermediate_size,
@@ -52,7 +53,7 @@ def train_one_epoch(
         0,
         0,
     )
-    train_dataloaders = generate_new_dataloaders(batch_size=batch_size)
+    train_dataloaders = generate_new_dataloaders(tokenizer, dataset, batch_size=8)
 
     for train_dataloader in train_dataloaders:
         for step, batch in enumerate(train_dataloader):

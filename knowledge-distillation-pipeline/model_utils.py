@@ -1,12 +1,33 @@
 import torch
 from torch.optim import AdamW
+from transformers import BertConfig, BertForMaskedLM
 
 
-# Placeholder: Replace with actual model loading logic
-def load_models():
+def load_student_model(hidden_size: int, num_layers: int, num_heads: int):
+    """Load the student model."""
+    config = BertConfig(
+        hidden_size=hidden_size, 
+        num_hidden_layers=num_layers,
+        num_attention_heads=num_heads
+    )
+    student = BertForMaskedLM(config)
+    return student
+
+
+def load_teacher_model():
+    """Load the teacher model."""
+    teacher = BertForMaskedLM.from_pretrained("bert-base-uncased")
+    return teacher
+
+
+def load_models(
+    hidden_size: int,
+    num_layers: int,
+    num_heads: int,
+):
     """Load and return student and teacher models."""
-    student = None  # TODO: Load student model
-    teacher = None  # TODO: Load teacher model
+    student = load_student_model(hidden_size=hidden_size, num_layers=num_layers, num_heads=num_heads)
+    teacher = load_teacher_model()
     return student, teacher
 
 
