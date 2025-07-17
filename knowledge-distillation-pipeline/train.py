@@ -4,6 +4,8 @@ import torch.nn.functional as F
 from copy import deepcopy
 import numpy as np
 
+from data_utils import generate_new_dataloaders
+
 
 def get_extended_attention_mask(attention_mask, input_shape, device=torch.device('cpu')):
     if attention_mask.dim() == 3:
@@ -53,7 +55,7 @@ def train_one_epoch(
         0,
         0,
     )
-    train_dataloaders = generate_new_dataloaders(tokenizer, dataset, batch_size=8)
+    train_dataloaders = generate_new_dataloaders(tokenizer, batch_size=8, split="train")
 
     for train_dataloader in train_dataloaders:
         for step, batch in enumerate(train_dataloader):

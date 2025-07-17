@@ -1,10 +1,12 @@
 import torch
 import numpy as np
 
+from data_utils import generate_new_dataloaders
+
 
 def validate(student, device, s_vocab_size):
     student.eval()
-    val_dataloaders = generate_new_dataloaders(max_n_samples=5000, batch_size=8)
+    val_dataloaders = generate_new_dataloaders(max_n_samples=5000, batch_size=8, split="val")
     nb_val_samples, val_s_true_preds = 0, 0
     for val_dataloader in val_dataloaders:
         for step, batch in enumerate(val_dataloader):
